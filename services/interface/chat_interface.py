@@ -1,4 +1,9 @@
 from abc import ABC, abstractmethod
+from models.schemas import ChatQuery
 
-from models.schemas import Query
 
+class ChatServiceInterface(ABC):
+    @abstractmethod
+    async def start_chat(
+        self, message: str) -> ChatQuery:
+        raise NotImplementedError()

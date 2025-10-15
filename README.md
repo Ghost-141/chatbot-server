@@ -1,6 +1,7 @@
 # Chatbot Server
 
-Backend for a retrieval-augmented customer support chatbot that answers questions about products stored in `data/product_info.json`. The service exposes FastAPI endpoints for both conversational queries (powered by Groq + LangChain) and a catalog feed.
+FastAPI based backend for a retrieval-augmented customer support chatbot that answers questions about products stored in [`product_info.json`](data/product_info.json)
+. The service exposes FastAPI endpoints for both conversational queries (powered by Groq + LangChain) and a catalog feed.
 
 ## Features
 
@@ -13,17 +14,16 @@ Backend for a retrieval-augmented customer support chatbot that answers question
 ## Tech Stack
 
 - Python 3.10+
-- FastAPI & Uvicorn
+- FastAPI & Pydantic v2
 - LangChain (Groq, Hugging Face embeddings, FAISS)
-- Pydantic v2
-- jq / JSONLoader for document parsing
+- jq and  JSONLoader for document parsing
 
 ## Getting Started
 
 ### 1. Clone & Environment
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Ghost-141/chatbot-server.git
 cd chatbot-server
 python -m venv .venv
 .venv\Scripts\activate          # Windows
@@ -32,12 +32,18 @@ source .venv/bin/activate       # macOS/Linux
 
 ### 2. Install Dependencies
 
-```bash
-pip install --upgrade pip
-pip install -e .
-# or: pip install -r pyproject.toml (using a PEP 621-aware installer like `uv`/`pip`)
-```
+- Install Using Pip 
+  ```bash
+  pip install --upgrade pip
+  pip install -r requirements.txt
+  ```
 
+- Install Using uv
+  ```bash
+  pip install --upgrade pip
+  pip install uv 
+  uv sync #automatically installs library
+  ```
 ### 3. Environment Variables
 
 Create a `.env` file in the project root:
@@ -46,25 +52,21 @@ Create a `.env` file in the project root:
 GROQ_API_KEY=<your-groq-api-key>
 ```
 
-> Never commit real API keys. The sample value in the repository is for development only.
+## Running the Server
+
+```bash
+uvicorn main:app --reload #using pip environment
+uv run uvicorn main:app --reload #using uv 
+```
 
 ### 4. Data Assets
 
-- `data/product_info.json` - master product catalog.
+- `data/product_info.json` - product catalog in `json` format.
 - `data/db/` - FAISS vector index (auto-created on first run).
 
 If you update the catalog, delete `data/db/` so the vector store can rebuild.
 
-## Running the API
 
-```bash
-uvicorn main:app --reload
-```
-
-The app mounts its routers under:
-
-- `POST /chat` - conversational answers.
-- `GET /products` - product catalog snapshot.
 
 Interactive docs: http://localhost:8000/docs
 
@@ -75,13 +77,13 @@ Interactive docs: http://localhost:8000/docs
 - **Body** (`ChatQuery`):
   ```json
   {
-    "message": "What discounts are available for the espresso machine?"
+    "message": "Tell me more about kiwi."
   }
   ```
 - **Response** (`ChatResponse`):
   ```json
   {
-    "message": "...LLM-generated answer..."
+    "model_response": "Kiwi is a nutrient‑rich fruit that’s perfect for snacking or adding a tropical twist to dishes. It’s priced at **$2.49** and currently comes with a **15.22 % discount**. Customers rate it highly, with an average **rating of 4.93 / 5**. The item is **in stock** (99 units available) and ships **overnight**. Additionally, it includes a **6‑month warranty** for added peace of mind."
   }
   ```
 
@@ -117,42 +119,44 @@ Interactive docs: http://localhost:8000/docs
   }
   ```
 
-## Project Layout
+## Project Structure
 
 ```
-main.py                       # FastAPI application entrypoint
-api/                          # Route definitions
-  chat.py                     # /chat endpoint
-  products.py                 # /products endpoint
-core/
-  config.py                   # Paths, model names, search params
-  dependency.py               # Service dependency wiring
-services/
-  chatbot_service.py          # Chat pipeline orchestrator
-  product_service.py          # JSON-backed product feed
-  interface/                  # Abstract service contracts
-models/schemas.py             # Pydantic request/response models
-utils/groq_client.py          # LangChain + Groq utilities
-system_prompts/prompt_v1.py   # Chatbot system prompt
-data/                         # Product catalog and vector index
+.
+├── api/
+│   ├── chat.py
+│   └── products.py
+├── core/
+│   ├── config.py
+│   └── dependency.py
+├── data/
+│   ├── db
+│   └── product_info.json
+├── models/
+│   └── schemas.py
+├── servies/
+│   ├── interface/
+│   │   ├── chat_interface.py
+│   │   └── product_interface.py
+│   ├── chatbot_service.py
+│   └── product_service.py  
+├── system_prompts/
+│   └── prompt_v1.py
+├── utils/
+│   └── groq_client.py
+├── .env
+├── requirements.txt
+├── README.md
+└── main.py
 ```
 
 ## Configuration Notes
 
 Adjust defaults in `core/config.py`:
 
-- `HUGGINGFACE_EMBEDDINGS_MODEL` to change embeddings.
+- `HUGGINGFACE_EMBEDDINGS_MODEL` to change embedding models.
 - `GROQ_MODEL_NAME`, `GROQ_TEMPERATURE`, `GROQ_MAX_RETRIES` to tune LLM behavior.
 - `RETRIEVER_SEARCH_*` to tweak vector-store retrieval.
+- Use `uv` for better user experience and avoid conflicts with other environments.
 
-## Troubleshooting
 
-- **Missing API key**: ensure `.env` is present or set `GROQ_API_KEY` in the shell.
-- **Vector store rebuilds every run**: confirm the process can write to `data/db/`.
-- **LangChain import issues**: verify the versions pinned in `pyproject.toml` are installed.
-
-## Next Steps
-
-- Add automated tests around `ProductService` and `ChatService`.
-- Integrate authentication or rate limiting if the API will be public.
-- Implement error handling/logging middleware for better observability.

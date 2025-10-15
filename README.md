@@ -6,7 +6,7 @@ FastAPI based backend for a retrieval-augmented customer support chatbot that an
 ## Features
 
 - Retrieval-augmented generation over the local product catalog.
-- Groq LLM integration with retry, temperature, and prompt controls.
+- Groq LLM (**GPT-OSS-120B**) integration with retry, temperature, and custom prompt controls.
 - FastAPI endpoints for chat responses and product listings.
 - Pluggable service interfaces for chat and product backends.
 - Automatic FAISS vector-store creation with caching for faster responses.
@@ -32,18 +32,27 @@ source .venv/bin/activate       # macOS/Linux
 
 ### 2. Install Dependencies
 
-- Install Using Pip 
+- Install Using **pip:** 
   ```bash
   pip install --upgrade pip
   pip install -r requirements.txt
   ```
 
-- Install Using uv
+- Install Using **uv:**
   ```bash
   pip install --upgrade pip
   pip install uv 
   uv sync #automatically installs library
   ```
+
+- Install Using **anaconda:**
+  
+  ```python
+  conda create -n chatbot python=3.10
+  conda activate chatbot
+  pip install -r requirements.txt
+  ```
+
 ### 3. Environment Variables
 
 Create a `.env` file in the project root:
@@ -55,7 +64,7 @@ GROQ_API_KEY=<your-groq-api-key>
 ## Running the Server
 
 ```bash
-uvicorn main:app --reload #using pip environment
+uvicorn main:app --reload #using pip/conda environment
 uv run uvicorn main:app --reload #using uv 
 ```
 
@@ -155,8 +164,9 @@ Interactive docs: http://localhost:8000/docs
 Adjust defaults in `core/config.py`:
 
 - `HUGGINGFACE_EMBEDDINGS_MODEL` to change embedding models.
-- `GROQ_MODEL_NAME`, `GROQ_TEMPERATURE`, `GROQ_MAX_RETRIES` to tune LLM behavior.
+- `GROQ_MODEL_NAME` to change LLM available in groq [website](https://console.groq.com/docs/models).
+-  `GROQ_TEMPERATURE`, `GROQ_MAX_RETRIES` to tune LLM behavior.
 - `RETRIEVER_SEARCH_*` to tweak vector-store retrieval.
-- Use `uv` for better user experience and avoid conflicts with other environments.
+- Use [uv](https://docs.astral.sh/uv/) for better user experience and avoid conflicts with other environments.
 
 

@@ -4,11 +4,14 @@ build/
 dist/
 wheels/
 *.egg-info
+*.ipynb
 
 # Virtual environments
 .venv
+.env
 
 
+# Database Files
 *.db
 *.sqlite3
 instance/

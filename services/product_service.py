@@ -18,7 +18,6 @@ class ProductService(ProductServiceInterface):
         except Exception as e:
             logger.error(f"Failed to validate product data: {e}")
             raise
-        # return ProductList.model_validate(data)
 
     def _read_products_file(self) -> dict:
         logger.info(f"Reading products from {PRODUCTS_JSON_PATH}")

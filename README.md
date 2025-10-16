@@ -8,8 +8,8 @@ FastAPI based backend for a retrieval-augmented customer support chatbot that an
 - Retrieval-augmented generation over the local product catalog.
 - Groq LLM (**GPT-OSS-120B**) integration with retry, temperature, and custom prompt controls.
 - FastAPI endpoints for chat responses and product listings.
-- Pluggable service interfaces for chat and product backends.
-- Automatic FAISS vector-store creation with caching for faster responses.
+- Added **logger** for easier debugging.
+- Automatic **FAISS** vector-store creation with caching for faster responses.
 
 ## Tech Stack
 

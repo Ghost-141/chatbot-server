@@ -17,7 +17,7 @@ class ProductService(ProductServiceInterface):
             return validated_data
         except Exception as e:
             logger.error(f"Failed to validate product data: {e}")
-            raise
+            raise ValueError(f"Unable to validate the product schema")
 
     def _read_products_file(self) -> dict:
         logger.info(f"Reading products from {PRODUCTS_JSON_PATH}")
